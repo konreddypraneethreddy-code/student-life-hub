@@ -1,0 +1,18 @@
+    CREATE DATABASE IF NOT EXISTS student_life_hub;
+USE student_life_hub;
+SET FOREIGN_KEY_CHECKS=0;
+DROP TABLE IF EXISTS users,notes,events,event_registrations,opportunities,saved_opportunities,clubs,club_members,tasks,announcements,hackathons,hackathon_registrations,saved_hackathons;
+SET FOREIGN_KEY_CHECKS=1;
+CREATE TABLE users(id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(100) NOT NULL,email VARCHAR(150) NOT NULL UNIQUE,password VARCHAR(255) NOT NULL,department VARCHAR(100),year INT,role ENUM('student','admin') DEFAULT 'student',blocked TINYINT(1) DEFAULT 0,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE notes(id INT AUTO_INCREMENT PRIMARY KEY,title VARCHAR(200) NOT NULL,subject VARCHAR(100),department VARCHAR(100),year INT,description TEXT,link VARCHAR(500),created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE events(id INT AUTO_INCREMENT PRIMARY KEY,title VARCHAR(200) NOT NULL,event_date DATE NOT NULL,event_time TIME,venue VARCHAR(200),description TEXT,organizer VARCHAR(150));
+CREATE TABLE event_registrations(id INT AUTO_INCREMENT PRIMARY KEY,event_id INT NOT NULL,user_id INT NOT NULL,UNIQUE(event_id,user_id),FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE opportunities(id INT AUTO_INCREMENT PRIMARY KEY,title VARCHAR(200) NOT NULL,organization VARCHAR(150),description TEXT,eligibility TEXT,deadline DATE,link VARCHAR(500),category ENUM('Internship','Scholarship','Job','Certification','Other') DEFAULT 'Other');
+CREATE TABLE saved_opportunities(id INT AUTO_INCREMENT PRIMARY KEY,opportunity_id INT NOT NULL,user_id INT NOT NULL,UNIQUE(opportunity_id,user_id),FOREIGN KEY(opportunity_id) REFERENCES opportunities(id) ON DELETE CASCADE,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE hackathons(id INT AUTO_INCREMENT PRIMARY KEY,title VARCHAR(200) NOT NULL,type ENUM('Hackathon','Coding Competition','Project Competition','Technical Competition') DEFAULT 'Hackathon',description TEXT,organizer VARCHAR(150),deadline DATE,link VARCHAR(500));
+CREATE TABLE hackathon_registrations(id INT AUTO_INCREMENT PRIMARY KEY,hackathon_id INT NOT NULL,user_id INT NOT NULL,UNIQUE(hackathon_id,user_id),FOREIGN KEY(hackathon_id) REFERENCES hackathons(id) ON DELETE CASCADE,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE saved_hackathons(id INT AUTO_INCREMENT PRIMARY KEY,hackathon_id INT NOT NULL,user_id INT NOT NULL,UNIQUE(hackathon_id,user_id),FOREIGN KEY(hackathon_id) REFERENCES hackathons(id) ON DELETE CASCADE,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE clubs(id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(150) NOT NULL,description TEXT,category VARCHAR(100),coordinator VARCHAR(100),meeting_info VARCHAR(200));
+CREATE TABLE club_members(id INT AUTO_INCREMENT PRIMARY KEY,club_id INT NOT NULL,user_id INT NOT NULL,UNIQUE(club_id,user_id),FOREIGN KEY(club_id) REFERENCES clubs(id) ON DELETE CASCADE,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE tasks(id INT AUTO_INCREMENT PRIMARY KEY,user_id INT NOT NULL,title VARCHAR(200) NOT NULL,description TEXT,deadline DATE,priority ENUM('Low','Medium','High') DEFAULT 'Medium',status ENUM('pending','completed') DEFAULT 'pending',FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE announcements(id INT AUTO_INCREMENT PRIMARY KEY,title VARCHAR(200) NOT NULL,description TEXT,category VARCHAR(100),important TINYINT(1) DEFAULT 0,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
